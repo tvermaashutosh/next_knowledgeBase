@@ -1,0 +1,30 @@
+{
+  "feature": {
+    "module": "Product Targeting",
+    "featureSlug": "custom-product-groups",
+    "title": "Custom Product Groups",
+    "tags": [
+      "product-group",
+      "custom",
+      "FOC",
+      "must-buy"
+    ],
+    "tenantConfigurable": true,
+    "tenantConfigPoints": [
+      "See Tenant-Level Configurations"
+    ],
+    "contentMd": "## What It Does\nAllows creating named groups of products used across promotions for FOC selection and must-buy conditions. Instead of specifying individual SKUs, promo creators reference a product group and the system dynamically resolves it.\n\n## Common Questions\n- **Can I create a reusable list of products for promotions?** Yes — use Custom Product Groups. Create a named group, add products, and reference it in promos.\n- **Can I use the same product list across multiple promotions?** Yes — that's the main benefit. Update the group once, and all promos using it reflect the change.\n- **Can I use product groups for free goods?** Yes — Product Groups can be used in FOC (free goods) and Must-Buy conditions.\n\n## Scope\n### In Scope\n- Creating and managing product groups\n- Using groups in FOC and must-buy conditions\n- Dynamic group membership resolution\n\n### Out of Scope\n- FOC calculation logic (covered in FOC Promotions)\n- Product scope filtering (covered in Product Scope)\n\n## Who Uses It\n- **Trade Marketing Manager** — creates and manages product groups in the Promo Management UI\n- **System** — resolves product group memberships during discount calculation\n\n## Rules\n1. Product groups are created and managed in the Promo Management UI\n2. A product group has a name and contains a list of product codes/SKUs\n3. Groups can be used for FOC (free product from group) and must-buy conditions\n4. Group membership is checked automatically during order processing\n5. A product can belong to multiple groups\n\n## Data & Fields\n| Field | Description | Required | Example |\n|-------|-------------|----------|--------|\n| Group Name | Name of the product group | Yes | Summer Beverages |\n| Product Codes | List of SKUs in the group | Yes | SKU-001, SKU-002 |\n| Usage | Where the group is used | No | FOC / Must-Buy |\n\n## Tenant-Level Configurations\n| Config Point | Options | Default | Example |\n|-------------|---------|---------|--------|\n| Group update frequency | Duration | 1 hour | How often group membership is refreshed |"
+  },
+  "scenarios": [
+    {
+      "scenarioSlug": "creating-and-using-product-groups",
+      "title": "Creating and Using Product Groups",
+      "tags": [
+        "product-group",
+        "creation",
+        "usage"
+      ],
+      "contentMd": "## What It Does\nProduct groups are reusable collections of SKUs. Once created, they can be referenced in any promotion — making promo setup faster and more consistent.\n\n## Example — Creating a Group\n1. Trade marketing opens the Promo Management UI\n2. Creates a product group named 'Summer Beverages'\n3. Adds products: Pepsi 500ml, 7Up 500ml, Mirinda 500ml, Slice 250ml\n4. Saves the group\n\n## Example — Using the Group for FOC\n1. Creates a FOC promo: 'Buy 20 cases of any snack, get 1 free from Summer Beverages group'\n2. A retailer orders 25 cases of snacks → qualifies\n3. System looks up the 'Summer Beverages' group → finds 4 products\n4. Checks which products the outlet stocks → outlet stocks Pepsi and 7Up\n5. Selects Pepsi 500ml as the free item (stock-based selection)\n6. Adds 1 × Pepsi 500ml as free goods to the order\n\n## Example — Using the Group for Must-Buy\n1. Creates a promo: 'Must buy at least 5 cases from Premium Chips group to qualify'\n2. 'Premium Chips' group contains: Lays Classic, Lays Magic Masala, Uncle Chips\n3. An order has: 3 cases Lays Classic + 2 cases Uncle Chips = 5 total from group → ✓ must-buy met\n4. Another order has: 3 cases Lays Classic + 1 case Kurkure → ✗ only 3 from group (Kurkure not in group)\n\n## Why Use Groups Instead of Individual SKUs?\n- **Reusability**: the same group can be used across many promos\n- **Easy updates**: add/remove a product from the group, and all promos using it automatically reflect the change\n- **Simpler promo setup**: reference 'Summer Beverages' instead of listing 4 individual SKUs each time\n\n## Rules\n1. Groups are referenced by name in promo configuration\n2. During order processing, the system resolves the group to its member products\n3. Group membership is automatically kept up to date for accurate results\n4. Groups can also be used as must-buy conditions: 'must buy from Premium Chips group'\n5. A product can belong to multiple groups simultaneously"
+    }
+  ]
+}

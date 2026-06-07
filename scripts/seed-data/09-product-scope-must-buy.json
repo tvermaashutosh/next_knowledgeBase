@@ -1,0 +1,42 @@
+{
+  "feature": {
+    "module": "Product Targeting",
+    "featureSlug": "product-scope-and-must-buy",
+    "title": "Product Scope & Must-Buy",
+    "tags": [
+      "product",
+      "scope",
+      "must-buy",
+      "qualification",
+      "AND-OR"
+    ],
+    "tenantConfigurable": true,
+    "tenantConfigPoints": [
+      "Product attribute targeting setup",
+      "Must-buy validation mode"
+    ],
+    "contentMd": "## What It Does\nDefines which products qualify for the promotion's discount (Product Scope) and which products MUST be in the order for the promo to activate (Must-Buy). These are two separate concepts:\n\n- **Product Scope**: products whose purchase counts toward slab qualification and on which discount applies\n- **Must-Buy**: mandatory products the order must contain for the promo to activate at all\n\n## Common Questions\n- **How do I specify which products a promotion applies to?** Use Product Scope — define by category, brand, sub-category, or individual SKU.\n- **Can I require certain products to be in the order before the promo activates?** Yes — use Must-Buy conditions. The order must contain the specified products.\n- **Can I set complex requirements like 'buy A AND B' or 'buy A OR B'?** Yes — Must-Buy supports AND, OR, and nested logic.\n- **What's the difference between product scope and must-buy?** Scope determines what gets the discount. Must-buy determines what must be in the order for the promo to even activate.\n\n## Key Difference Between Scope and Must-Buy\n- Product Scope answers: 'What products does the discount apply to?'\n- Must-Buy answers: 'What products must be in the order for the promo to even activate?'\n- A promo can have both: must-buy to activate, then scope determines what gets the discount\n\n## Scope\n### In Scope\n- Product scope definition by category, brand, SKU\n- Must-buy conditions with AND/OR/nested logic\n- Per-product date overrides\n\n### Out of Scope\n- Product group management (covered in Custom Product Groups)\n- FOC product selection (covered in FOC Promotions)\n\n## Who Uses It\n- **Trade Marketing Manager** — configures product scope and must-buy when creating a promo\n- **System** — validates must-buy conditions before applying discounts\n\n## Rules\n1. Product Scope and Must-Buy are separate lists with different purposes\n2. Must-Buy supports AND/OR logic with nested grouping\n3. Can be defined at any granularity: SKU, batch code, brand, category, sub-category, flavour, size, item class\n4. Each must-buy item has minimum value (quantity) and unit (pieces/cases)\n5. Product Bifurcations: per-product date overrides\n6. A single promo commonly combines outlet + product + must-buy + FOC + budget\n\n## Data & Fields\n| Field | Description | Required | Example |\n|-------|-------------|----------|--------|\n| Product Scope | Products qualifying for discount | Yes | Category = Beverages |\n| Must-Buy Product | Mandatory product | No | SKU-PEPSI-500ML |\n| Must-Buy Quantity | Minimum qty required | No | 10 |\n| Must-Buy Unit | UOM | No | Case / Piece |\n| Comparator | AND/OR logic | No | AND |\n| Parent Comparator | Nested group logic | No | OR |\n\n## Tenant-Level Configurations\n| Config Point | Options | Default | Example |\n|-------------|---------|---------|--------|\n| Product attribute targeting | Maps product attributes to targeting criteria | Tenant-specific | Brand, Category |\n| Must-buy validation | Strict / Lenient | Strict | How strictly must-buy is enforced |"
+  },
+  "scenarios": [
+    {
+      "scenarioSlug": "product-scope-qualification",
+      "title": "Product Scope — What Counts Toward Slab Qualification",
+      "tags": [
+        "product-scope",
+        "slab",
+        "qualification"
+      ],
+      "contentMd": "## What It Does\nThe product scope determines which products in an order are counted toward slab qualification and which receive the discount. Products outside the scope are completely ignored.\n\n## Example\n1. A promo has Product Scope = Beverages category\n2. The promo has: Slab 1 (50+ cases → 10% off)\n3. An order contains: 60 cases of beverages + 30 cases of snacks\n4. System identifies that only beverages are in scope\n5. Only the 60 cases of beverages count toward slab qualification\n6. 60 ≥ 50 → qualifies for Slab 1 → 10% discount applied to beverages only\n7. The 30 cases of snacks are completely ignored — no discount, no counting\n\n## Example — Scope by Brand\nA promo targets Brand = Pepsi specifically:\n- Order has 20 cases of Pepsi, 15 cases of 7Up, 10 cases of Mirinda\n- Product scope = Pepsi brand only\n- Only the 20 cases of Pepsi count toward qualification\n- 7Up and Mirinda are ignored even though they are from the same company\n\n## Example — Scope by Individual SKU\nA promo targets SKU = SKU-PEPSI-500ML:\n- Order has 50 × Pepsi 500ml + 30 × Pepsi 1L\n- Only 50 × Pepsi 500ml is counted — 1L is out of scope\n\n## Rules\n1. Product Scope defines WHICH products are eligible for the promo's benefit\n2. Products outside scope are ignored during slab calculation\n3. Scope can be defined by category, brand, sub-category, individual SKU, or any combination\n4. Product targeting works the same way as outlet targeting — using configurable criteria mapped to product attributes"
+    },
+    {
+      "scenarioSlug": "must-buy-and-or-logic",
+      "title": "Must-Buy Conditions with AND/OR Logic",
+      "tags": [
+        "must-buy",
+        "AND-OR",
+        "activation"
+      ],
+      "contentMd": "## What It Does\nMust-buy conditions are mandatory requirements that an order must meet before a promo can activate. Unlike product scope, must-buy doesn't define what gets the discount — it defines the prerequisite for the promo to even apply.\n\n## Example — Simple Must-Buy (AND logic)\nA promo requires: Must buy 10+ cases of Pepsi 500ml AND 5+ cases of 7Up 500ml.\n- Order has 15 cases Pepsi 500ml + 8 cases 7Up 500ml → ✓ Both conditions met → promo activates\n- Order has 15 cases Pepsi 500ml + 3 cases 7Up 500ml → ✗ 7Up is below minimum → promo does NOT activate\n- Order has 15 cases Pepsi 500ml only (no 7Up) → ✗ Missing 7Up → promo does NOT activate\n\n## Example — OR Logic\nA promo requires: Must buy 10+ cases of Pepsi 500ml OR 10+ cases of 7Up 500ml.\n- Order has 12 cases Pepsi 500ml (no 7Up) → ✓ Pepsi condition met → promo activates\n- Order has 0 Pepsi + 15 cases 7Up → ✓ 7Up condition met → promo activates\n- Order has 5 Pepsi + 5 7Up → ✗ Neither condition met → promo does NOT activate\n\n## Example — Nested Logic (AND groups combined with OR)\nA promo requires: (Pepsi 500ml × 10 AND Lays × 5) OR (7Up 500ml × 10 AND Kurkure × 5)\n- This creates two groups:\n  - Group 1: Pepsi + Lays\n  - Group 2: 7Up + Kurkure\n- The order must meet ALL conditions in at least ONE group\n- Order with 10 Pepsi + 5 Lays → ✓ Group 1 met → promo activates\n- Order with 10 7Up + 5 Kurkure → ✓ Group 2 met → promo activates\n- Order with 10 Pepsi + 5 Kurkure → ✗ Neither group fully met → promo does NOT activate\n\n## Rules\n1. Must-buy is checked BEFORE slab qualification — if must-buy fails, the promo doesn't apply at all\n2. AND logic: ALL conditions in the group must be met\n3. OR logic: any ONE condition in the group being met is sufficient\n4. Nested logic: AND groups combined with OR allow complex requirements\n5. Each must-buy item specifies: product (SKU/brand/category), minimum quantity, and unit (pieces/cases)"
+    }
+  ]
+}

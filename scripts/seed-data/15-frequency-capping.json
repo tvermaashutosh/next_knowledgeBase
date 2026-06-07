@@ -1,0 +1,36 @@
+{
+  "feature": {
+    "module": "Budget, Caps & Limits",
+    "featureSlug": "frequency-capping",
+    "title": "Frequency Capping",
+    "tags": [
+      "frequency",
+      "daily-limit",
+      "weekly",
+      "monthly",
+      "quarterly",
+      "annual",
+      "lifetime",
+      "time-based-limit"
+    ],
+    "tenantConfigurable": true,
+    "tenantConfigPoints": [
+      "Frequency capping toggle",
+      "Supported frequency periods"
+    ],
+    "contentMd": "## What It Does\nControls how often a promotion can be used within specific time periods. Unlike usage limits which are absolute counts, frequency capping adds time-based controls — a promo can be used X times per day, week, month, quarter, year, or lifetime.\n\nMultiple periods can be combined. When any limit is hit, the promo pauses until that period resets.\n\n## Common Questions\n- **Can I limit a promo to once per day?** Yes — set Daily Limit = 1.\n- **Can I limit a promo to a certain number per week or month?** Yes — set Weekly or Monthly Limit. You can combine multiple time periods.\n- **What's the difference between frequency capping and usage limits?** Usage limits are absolute counters (e.g., max 100 uses total). Frequency capping is time-based (e.g., max 5 uses per day, resetting at midnight).\n- **Can I set a lifetime maximum?** Yes — Lifetime Limit is a hard cap that never resets.\n- **What happens when a daily limit resets?** At midnight, the daily counter goes back to zero and the promo can be used again.\n\n## Scope\n### In Scope\n- Daily, Weekly, Monthly, Quarterly, Annual, Lifetime limits\n- Combined frequency limits\n- Period-based reset logic\n\n### Out of Scope\n- Absolute usage limits (covered in Usage Limits)\n- Monetary budget (covered in Promotion Budget)\n\n## Who Uses It\n- **Trade Marketing Manager** — configures frequency caps when creating a promotion\n- **System** — tracks usage per time period and enforces limits\n\n## Rules\n1. Daily, Weekly, Monthly, Quarterly, Annual, and Lifetime limits available\n2. Multiple frequencies can be set together\n3. When ANY one limit is hit, promo pauses until reset\n4. Lifetime limit never resets\n\n## Data & Fields\n| Field | Description | Required | Example |\n|-------|-------------|----------|--------|\n| Daily Limit | Max uses per day | No | 5 |\n| Weekly Limit | Max uses per week | No | 20 |\n| Monthly Limit | Max uses per month | No | 60 |\n| Quarterly Limit | Max uses per quarter | No | 150 |\n| Annual Limit | Max uses per year | No | 500 |\n| Lifetime Limit | Total lifetime uses | No | 2000 |\n\n## Tenant-Level Configurations\n| Config Point | Options | Default | Example |\n|-------------|---------|---------|--------|\n| Frequency capping toggle | ON/OFF | OFF | Enable time-based capping |\n| Supported periods | Daily/Weekly/Monthly/Quarterly/Annual/Lifetime | All | Which periods are available |"
+  },
+  "scenarios": [
+    {
+      "scenarioSlug": "time-based-frequency-limits",
+      "title": "Setting Up Time-Based Frequency Limits",
+      "tags": [
+        "frequency",
+        "daily",
+        "weekly",
+        "combined"
+      ],
+      "contentMd": "## Common Questions\n- **If I set daily = 5 and weekly = 20, what happens?** Both limits run at the same time. Each day max 5 uses. But even if you have daily capacity left, once the weekly total hits 20, the promo stops for the rest of the week.\n- **When do limits reset?** Daily resets at midnight, weekly at start of the week, monthly at start of month, quarterly at start of quarter.\n\n## Example — Combined Daily + Weekly Limits\n1. Trade marketing sets a promo with Daily Limit = 5 and Weekly Limit = 20\n2. Day 1 (Monday): 5 orders use the promo → daily limit hit → promo pauses for Monday\n3. Day 2 (Tuesday): daily counter resets → 5 more uses allowed → total this week = 10\n4. Day 3 (Wednesday): 5 more uses → total this week = 15\n5. Day 4 (Thursday): 5 more uses → total this week = 20 → weekly limit hit!\n6. Day 5 (Friday): even though daily counter reset, weekly limit is exhausted → promo is blocked\n7. Next Monday: both daily and weekly counters reset → promo is active again\n\n## Example — Lifetime Cap\nA promo has Lifetime Limit = 2,000:\n- Over 6 months, the promo has been used 1,998 times\n- Two more orders use it → total = 2,000 → lifetime cap hit\n- The promo is permanently stopped — it will never reset\n- Unlike daily/weekly limits, lifetime never resets\n\n## Rules\n1. Daily limit resets at midnight, weekly at start of week, monthly at start of month\n2. When multiple frequencies are set, the most restrictive one at any moment wins\n3. Lifetime limit is a hard cap that never resets — once hit, promo permanently stops\n4. Example: Daily 5 + Weekly 20 + Lifetime 2000 — all three are enforced simultaneously\n5. Frequency capping is independent of usage limits (order caps) — both can coexist on the same promo"
+    }
+  ]
+}

@@ -1,0 +1,43 @@
+{
+  "feature": {
+    "module": "Budget, Caps & Limits",
+    "featureSlug": "promotion-budget",
+    "title": "Promotion Budget",
+    "tags": [
+      "budget",
+      "spending-limit",
+      "threshold",
+      "distributor-budget",
+      "overall"
+    ],
+    "tenantConfigurable": true,
+    "tenantConfigPoints": [
+      "Budget type auto-detection",
+      "Budget threshold percentage",
+      "Overall vs per-distributor toggle"
+    ],
+    "contentMd": "## What It Does\nSets a spending or quantity limit for a promotion. Once consumed, the promo stops. Supports overall level (shared across distributors) or per-distributor level (each has their own allocation).\n\nA safety threshold percentage can keep part of the budget as reserve.\n\n## Common Questions\n- **Can I set a spending cap on a promotion?** Yes — set a Budget Value in ₹ (for cash discounts) or in quantity (for free goods).\n- **What happens when the budget runs out?** The promo automatically stops applying to new orders. It doesn't get deleted — it just pauses.\n- **Can each distributor have their own budget?** Yes — turn on 'Per-Distributor' mode and allocate separate budgets.\n- **Can I keep some budget in reserve?** Yes — use the Budget Threshold %. Setting 20% means the promo stops at 80% consumption.\n- **How is budget tracked?** Budget is reserved when an order is placed, confirmed when invoiced, and released if the order is cancelled.\n\n## Scope\n### In Scope\n- Budget type configuration (Amount/Quantity)\n- Threshold percentage for safety reserve\n- Overall vs per-distributor budget\n- Budget tracking across order lifecycle\n\n### Out of Scope\n- Usage limits (covered in Usage Limits)\n- Frequency capping (covered in Frequency Capping)\n- Budget restoration on cancel (covered in Budget Restoration)\n\n## Who Uses It\n- **Trade Marketing Manager** — sets budget when creating a promotion\n- **System** — tracks consumed vs total budget and stops the promo when exhausted\n\n## Rules\n1. Budget Type: Amount (₹) for cash discounts, Quantity for free goods — auto-detected\n2. Budget Value: total limit for the promo\n3. Budget Threshold %: safety reserve (e.g., 20% = stop at 80% consumption)\n4. Overall Level: one shared budget across all distributors\n5. Per-Distributor: each distributor has separate allocation\n6. Budget is tracked as orders progress: reserved when placed, confirmed when invoiced, released if cancelled or expired\n7. Budget is deducted after the discount is applied\n8. Insufficient budget = promo is skipped\n\n## Data & Fields\n| Field | Description | Required | Example |\n|-------|-------------|----------|--------|\n| Budget Type | Amount or Quantity | Yes | Amount |\n| Budget Value | Total budget | Yes | ₹50,000 |\n| Budget Threshold % | Safety reserve | No | 20 |\n| Apply at Overall Level | Shared vs per-distributor | Yes | ON / OFF |\n\n## Tenant-Level Configurations\n| Config Point | Options | Default | Example |\n|-------------|---------|---------|--------|\n| Budget type | Amount / Quantity | Auto | Based on promo benefit |\n| Threshold percentage | 0-100 | 0 | 20% safety reserve |\n| Overall vs per-distributor | Toggle | Overall | Shared or separate |"
+  },
+  "scenarios": [
+    {
+      "scenarioSlug": "budget-with-threshold-and-distributor-allocation",
+      "title": "Setting Up Budget with Threshold and Distributor Allocation",
+      "tags": [
+        "budget",
+        "threshold",
+        "per-distributor"
+      ],
+      "contentMd": "## Common Questions\n- **How do I split the budget between distributors?** Turn off 'Apply at Overall Level' and allocate specific amounts to each distributor.\n- **What does the threshold percentage do?** It creates a safety buffer. With 20% threshold, the promo stops when 80% of the budget is used — leaving 20% as a reserve.\n- **Does the threshold apply per distributor or overall?** In per-distributor mode, the threshold applies to each distributor's allocation separately.\n\n## Example\n1. Trade marketing creates a promo with ₹1,00,000 total budget\n2. Sets threshold at 20% (promo stops at 80% consumption)\n3. Turns OFF 'Apply at Overall Level' → each distributor gets separate allocation\n4. Distributor A gets: ₹60,000, Distributor B gets: ₹40,000\n5. Distributor A's 80% mark = ₹48,000\n6. Orders consume ₹48,000 from Distributor A's budget → promo stops for Distributor A\n7. Distributor B has only consumed ₹10,000 → promo continues for Distributor B\n8. ₹12,000 remains as Distributor A's safety reserve\n\n## Rules\n1. Per-distributor mode: each distributor's budget is tracked independently\n2. Threshold applies to each distributor's allocation separately\n3. When one distributor's budget is exhausted, others are unaffected\n4. Budget Type (amount vs quantity) is auto-detected from the promo's benefit type"
+    },
+    {
+      "scenarioSlug": "budget-exhaustion-auto-stop",
+      "title": "Budget Exhaustion and Auto-Stop",
+      "tags": [
+        "budget",
+        "exhaustion",
+        "auto-stop"
+      ],
+      "contentMd": "## Common Questions\n- **What happens when a promotion runs out of budget?** The system skips the promo for orders where the discount would exceed the remaining budget. Smaller qualifying orders may still get the discount.\n- **Does the promo get permanently disabled?** No — it continues checking. If later orders need less than the remaining budget, they still get the discount.\n- **Is budget checked before or after the discount is calculated?** The discount is calculated first, then the budget is checked. If there's not enough budget, the entire promo is skipped for that order.\n\n## Example\n1. A promo has ₹50,000 total budget with no threshold\n2. ₹48,000 has been consumed by previous orders\n3. Remaining budget: ₹2,000\n4. A new order qualifies for ₹3,000 discount\n5. ₹3,000 > ₹2,000 remaining → budget would be exceeded\n6. System skips this promo for the order — discount is NOT applied\n7. But then another order qualifies for only ₹1,500 discount\n8. ₹1,500 ≤ ₹2,000 remaining → discount IS applied ✓\n9. Remaining budget: ₹500\n\n## Rules\n1. Budget check happens AFTER discount is calculated but BEFORE it's applied\n2. If remaining budget is insufficient for the calculated discount, promo is skipped entirely (no partial discount)\n3. Promo doesn't permanently stop — it can apply to smaller qualifying orders\n4. Budget status tracks: reserved (order placed), confirmed (invoiced), released (cancelled or expired)"
+    }
+  ]
+}

@@ -1,0 +1,33 @@
+{
+  "feature": {
+    "module": "Supplier & Distributor Targeting",
+    "featureSlug": "distributor-scoped-promotions",
+    "title": "Distributor-Scoped Promotions",
+    "tags": [
+      "distributor",
+      "supplier",
+      "primary-promo",
+      "invoice",
+      "DMS"
+    ],
+    "tenantConfigurable": true,
+    "tenantConfigPoints": [
+      "Distributor budget tracking mode",
+      "Primary promo configuration"
+    ],
+    "contentMd": "## What It Does\nEnables promotions to be scoped to specific distributors (also called suppliers). Includes distributor-level budget tracking, per-distributor usage limits, and primary promotions calculated at invoice time.\n\nCommonly used for distributor-funded promotions where the distributor bears the cost.\n\n## Common Questions\n- **Can a distributor run their own promotion?** Yes — Distributor-Scoped Promotions allow each distributor to fund and manage their own promo.\n- **Can each distributor have a separate budget?** Yes — per-distributor budget tracking gives each distributor their own allocation.\n- **What is a primary promo?** A distributor-level promo that is calculated at invoice time (when the invoice is finalized) rather than order time.\n- **Why calculate at invoice time?** Because the delivered quantity may differ from the ordered quantity (partial deliveries), so the discount should be based on actual delivery.\n\n## How Distributor Promos Differ from Regular Promos\n- **Regular promos**: funded by the company, applied across all distributors, calculated at order time\n- **Distributor promos**: funded by a specific distributor, applied only to that distributor's outlets, can be calculated at invoice time\n- Each distributor manages their own budget allocation\n\n## Scope\n### In Scope\n- Distributor-scoped promo creation\n- Per-distributor budget tracking\n- Primary promo invoice-time calculation\n\n### Out of Scope\n- Budget restoration (covered in Budget Restoration)\n- Overall budget management (covered in Promotion Budget)\n\n## Who Uses It\n- **Distributor** — manages and funds promotions for their outlets via DMS\n- **Trade Marketing Manager** — creates distributor-specific promotions\n- **System** — applies distributor-level logic during calculation\n\n## Rules\n1. Supplier and Distributor refer to the same entity\n2. A promo can be scoped to specific distributors\n3. Primary promos are generally defined at the distributor level\n4. Distributor-level budget: each distributor has their own allocation\n5. Distributor usability check determines if a distributor can use a promo\n\n## Data & Fields\n| Field | Description | Required | Example |\n|-------|-------------|----------|--------|\n| Distributor Code | Distributor identifier | Yes | DIST-001 |\n| Distributor Budget | Per-distributor allocation | No | ₹10,00,000 |\n| Primary Promo Flag | Invoice-time calculation | No | true / false |\n\n## Tenant-Level Configurations\n| Config Point | Options | Default | Example |\n|-------------|---------|---------|--------|\n| Budget tracking mode | Shared / Per-distributor | Per-distributor | Each distributor tracks own budget |\n| Primary promo config | ON/OFF | ON | Enable invoice-time primary promos |"
+  },
+  "scenarios": [
+    {
+      "scenarioSlug": "distributor-budget-and-primary-promos",
+      "title": "Distributor Budget and Primary Promos",
+      "tags": [
+        "distributor",
+        "budget",
+        "primary-promo",
+        "invoice-time"
+      ],
+      "contentMd": "## What It Does\nDistributor-funded promotions have separate budgets per distributor. Primary promos (a common type of distributor promo) are calculated at invoice time rather than order time.\n\n## Example — Distributor-Funded Promo\nPepsi India runs a national promo '10% off on Pepsi 500ml', but each regional distributor funds their own share:\n1. Distributor A (North India) has ₹10,00,000 budget\n2. Distributor B (South India) has ₹8,00,000 budget\n3. Retailer served by Distributor A orders 100 cases → ₹10,000 discount → deducted from Distributor A's budget\n4. Distributor A has ₹9,90,000 remaining\n5. Distributor B's budget is completely unaffected\n6. When Distributor A's budget runs out, their outlets stop getting the promo — but Distributor B's outlets still get it\n\n## Example — Primary Promo (Invoice-Time Calculation)\n1. Trade marketing creates a primary promo funded by Distributor A with ₹10,00,000 budget\n2. A retailer orders 100 cases at order time → regular promos are calculated and shown\n3. Later, the order is invoiced — only 90 cases were actually delivered\n4. At invoice time, the primary promo runs on the 90 delivered cases\n5. Discount = 10% of 90 cases = ₹9,000 (not ₹10,000 based on original 100 cases)\n6. ₹9,000 is deducted from Distributor A's budget\n\n## Why Invoice-Time Matters\n- Ordered quantity often differs from delivered/invoiced quantity (partial deliveries, out-of-stock)\n- Primary promos wait for the final invoiced quantity to ensure accuracy\n- This prevents over-discounting when fewer items are actually delivered\n\n## Rules\n1. Primary promos calculate at invoice time, not order time\n2. Distributor-level budget is tracked separately from overall promo budget\n3. When a distributor's budget is exhausted, the promo stops for their outlets only\n4. Other distributors' budgets are unaffected\n5. Distributor budget can be set as shared (overall) or per-distributor\n6. This is commonly used for distributor-funded trade promotions in FMCG distribution"
+    }
+  ]
+}

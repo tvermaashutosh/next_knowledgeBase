@@ -1,0 +1,31 @@
+{
+  "feature": {
+    "module": "Location-Based Targeting",
+    "featureSlug": "geography-territory-targeting",
+    "title": "Geography & Territory Targeting",
+    "tags": [
+      "territory",
+      "geography",
+      "region",
+      "location-targeting"
+    ],
+    "tenantConfigurable": true,
+    "tenantConfigPoints": [
+      "Territory hierarchy configuration",
+      "Location filter configuration"
+    ],
+    "contentMd": "## What It Does\nEnables promotions to be targeted based on geographic or territory attributes. Separate from outlet targeting — filters by the outlet's physical location in a territory hierarchy.\n\nThe territory hierarchy is configurable per tenant to match their distribution structure.\n\n## Common Questions\n- **Can I run a promotion in a specific region only?** Yes — use Geography Targeting. Set the region, area, or territory.\n- **How is location targeting different from outlet targeting?** Outlet targeting filters by outlet attributes (type, channel). Location targeting filters by physical location (region, territory).\n- **Can I combine location and outlet targeting?** Yes — both work together on the same promo. E.g., Gold outlets in North Region.\n- **What territory levels are available?** Configurable per tenant. Common hierarchy: Region → Area → Territory → Beat.\n\n## How It Differs from Outlet Targeting\n- **Outlet Targeting**: filters by outlet attributes (Gold/Silver, Modern Trade/General Trade)\n- **Geography Targeting**: filters by where the outlet is located (North Region, Mumbai Territory)\n- Both can be used together on the same promo\n\n## Scope\n### In Scope\n- Territory hierarchy configuration\n- Location-based promo targeting\n- Location-based targeting criteria\n\n### Out of Scope\n- Outlet-level targeting (covered in Outlet Eligibility)\n- Product-level targeting (covered in Product Scope)\n\n## Who Uses It\n- **Trade Marketing Manager** — scopes a promo to specific geographies\n- **Regional Sales Manager** — creates region-specific promotions\n\n## Rules\n1. Location targeting is separate from outlet targeting\n2. Territory hierarchy is configurable per tenant (e.g., Region → Area → Territory → Beat)\n3. Location attributes are matched against the promo's filter values\n4. A promo can target specific territories while being open on other attributes\n\n## Data & Fields\n| Field | Description | Required | Example |\n|-------|-------------|----------|--------|\n| Territory Level | Hierarchy level | Yes | Region / Area / Territory / Beat |\n| Territory Value | Specific territory name | Yes | North Region |\n| Market ID | Market identifier | No | MKT-NORTH-001 |\n\n## Tenant-Level Configurations\n| Config Point | Options | Default | Example |\n|-------------|---------|---------|--------|\n| Territory hierarchy | Configurable levels | Tenant-specific | Region → Area → Territory → Beat |\n| Location filter config | Which location fields to filter | Tenant-specific | territory, subTerritory, marketId |"
+  },
+  "scenarios": [
+    {
+      "scenarioSlug": "territory-based-promo-scoping",
+      "title": "Territory-Based Promo Scoping",
+      "tags": [
+        "territory",
+        "geography",
+        "scoping"
+      ],
+      "contentMd": "## What It Does\nAllows a promo to be restricted to specific geographic areas using the territory hierarchy. An outlet's location is determined by its master data — the system checks this location against the promo's territory criteria.\n\n## Example — Regional Promo\nA company wants to run a monsoon promotion only in South India:\n1. Trade marketing creates a promo: '20% off on umbrellas — South Region only'\n2. Sets geography targeting: Region = South\n3. An outlet in Chennai (South Region) places an order for umbrellas → **promo IS applied** ✓\n4. An outlet in Delhi (North Region) places an order for umbrellas → **promo is NOT applied** ✗\n\n## Example — Territory-Level Promo\nA company wants a more granular promo for a specific sales territory:\n1. Promo: 'Free 5 cases of Pepsi for every 50 cases ordered — Mumbai East Territory'\n2. Sets geography targeting: Territory = Mumbai East\n3. Hierarchy: Region (West) → Area (Mumbai) → Territory (Mumbai East)\n4. Outlets in Mumbai East → ✓ eligible\n5. Outlets in Mumbai West (same area, different territory) → ✗ not eligible\n6. Outlets in Delhi (different region entirely) → ✗ not eligible\n\n## Example — Combined with Outlet Targeting\nA promo targets: Region = North AND Outlet Type = Gold:\n- Gold outlet in North Region → ✓ matches both\n- Silver outlet in North Region → ✗ outlet type doesn't match\n- Gold outlet in South Region → ✗ region doesn't match\n\n## Rules\n1. Territory hierarchy allows targeting at any level (Region, Area, Territory, Beat)\n2. More specific targeting overrides broader levels\n3. An outlet's location is determined by its master data attributes\n4. Location targeting uses the same criteria-based approach as outlet and product targeting\n5. Geography targeting can be combined with outlet, product, and distributor targeting on the same promo"
+    }
+  ]
+}

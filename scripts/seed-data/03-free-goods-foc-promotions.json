@@ -1,0 +1,54 @@
+{
+  "feature": {
+    "module": "Promotion Setup",
+    "featureSlug": "free-goods-foc-promotions",
+    "title": "Free Goods (FOC) Promotions",
+    "tags": [
+      "FOC",
+      "free-goods",
+      "giveaway",
+      "product-group",
+      "user-selection",
+      "free-products"
+    ],
+    "tenantConfigurable": true,
+    "tenantConfigPoints": [
+      "Stock check mode",
+      "Select all FOCs config",
+      "FOC product matcher"
+    ],
+    "contentMd": "## What It Does\nEnables promotions that give free products instead of (or in addition to) monetary discounts. Supports multiple FOC models — from fixed free items to buyer-chosen selections from a product group.\n\nFOC items are always linked to a specific slab, so the free goods quantity or type can vary by purchase tier.\n\n## Common Questions\n- **Can I give free products with a purchase?** Yes — use FOC (Free of Cost) promotions. E.g., buy 50 cases, get 5 free items.\n- **Can the customer choose which free item they want?** Yes — use User-Selected FOC mode. The buyer picks from an allowed list.\n- **Can I give a free item from a group of products?** Yes — use Product Group FOC. The system picks from a named product group.\n- **Can I give multiple free items?** Yes — use AND logic to give all free items, or OR logic to give only the highest-priority one.\n- **How is the free item selected?** Configurable: stock-based (what the outlet stocks) or random selection.\n\n## Scope\n### In Scope\n- Multi-FOC with AND/OR logic\n- Product Group FOC\n- User-Selected FOC\n- Stock check configuration\n- FOC quantity linked to slabs\n\n### Out of Scope\n- Monetary discounts (covered in Discount Types)\n- Must-buy conditions (covered in Product Scope)\n\n## Who Uses It\n- **Trade Marketing Manager** — configures which free products are offered, quantities, and selection rules\n- **Salesperson / Retailer / Distributor** — sees FOC items applied or selects them during order\n- **System** — determines eligible FOC items and validates stock\n\n## Rules\n1. FOC items are always linked to a specific slab via a slab link ID\n2. Stock check for FOC items is configurable — catalog-only or physical stock\n3. FOC total quantity can be controlled by the budget feature\n4. Multiple free items within a slab can be grouped via a link ID\n\n## Data & Fields\n| Field | Description | Required | Example |\n|-------|-------------|----------|--------|\n| Free Product | Specific SKU or product group | Yes | SKU-PEPSI-500ML |\n| Product Group | Named group for selection | No | Summer Beverages |\n| Quantity | Number of free items | Yes | 5 |\n| Unit | UOM for free items | Yes | Piece / Case |\n| Comparator | AND or OR logic | Yes | AND |\n| FOC Priority | Selection priority for OR logic | No | 1 |\n| Slab Link ID | Links FOC to a slab tier | Yes | slab-001 |\n\n## Tenant-Level Configurations\n| Config Point | Options | Default | Example |\n|-------------|---------|---------|--------|\n| Stock check mode | Catalog only / Physical stock | Catalog only | Check physical stock before FOC |\n| Select all FOCs | ON/OFF | OFF | Return all FOC options for invoiced orders |\n| FOC product matcher | Stock-based / Random | Stock-based | How to pick from product group |"
+  },
+  "scenarios": [
+    {
+      "scenarioSlug": "multi-foc-and-or-logic",
+      "title": "Multi-FOC with AND/OR Logic",
+      "tags": [
+        "FOC",
+        "AND-OR",
+        "priority"
+      ],
+      "contentMd": "## Common Questions\n- **Can I give ALL free items or just one?** AND logic gives ALL. OR logic gives only the highest-priority one.\n- **How does priority work for free items?** When using OR logic, each free item has a priority number. The system gives only the item with the highest priority.\n\n## Example with AND Logic\nA promo says: Buy 50 cases of beverages, get 5 pieces of Product A **AND** 3 pieces of Product B free.\n- Customer orders 50 cases of beverages → qualifies\n- Customer receives BOTH: 5 × Product A and 3 × Product B\n- Both items are mandatory — the customer cannot choose to skip one\n\n## Example with OR Logic\nA promo says: Buy 50 cases, get either 5 × Product A **OR** 3 × Product B free.\n- Customer qualifies → system selects the highest-priority item\n- If Product A has priority 1 and Product B has priority 2, the customer gets Product A\n- Only ONE of the free items is given, not both\n\n## Rules\n1. **AND logic**: customer receives ALL configured free items (e.g., 5 Product A AND 3 Product B)\n2. **OR logic**: customer receives only the highest-priority free item (priority set by promo creator)\n3. FOC priority determines selection order when OR logic is used\n4. Multiple FOC items within the same slab are grouped via a link ID\n5. AND/OR logic works within a group — different groups may have different logic\n\n## Use Case\nAND is used when the company wants to push multiple products as free samples. OR is used when the company offers alternatives and wants to control which one is preferred (e.g., give the newer product higher priority so it gets distributed more)."
+    },
+    {
+      "scenarioSlug": "product-group-foc",
+      "title": "Product Group FOC — Free Item from Group",
+      "tags": [
+        "FOC",
+        "product-group",
+        "stock-based"
+      ],
+      "contentMd": "## Common Questions\n- **Can I give any product from a category as a free item?** Yes — create a product group (e.g., 'Summer Beverages') and use Product Group FOC. The system picks from the group.\n- **Does the system check if the outlet stocks the free product?** Yes — in stock-based mode, only products the outlet actually stocks are selected.\n\n## Example\nA promo offers: Buy 30 cases of snacks, get 1 free item from the 'Summer Beverages' group.\n- The 'Summer Beverages' group contains: Pepsi 500ml, 7Up 500ml, Mirinda 500ml, Slice 250ml\n- An outlet that stocks only Pepsi and 7Up places an order for 30 cases of snacks\n- System checks outlet's stock → selects Pepsi 500ml as the free item\n- If the outlet stocked none of the group items, the FOC may not be applied\n\n## Rules\n1. Free item is selected from a custom product group, not a fixed SKU\n2. Selection mode is configurable: stock-based checks what the outlet actually stocks, random picks any item\n3. System checks outlet eligibility for the selected product\n4. If stock-based and no items are in stock at the outlet, the FOC may not be applied\n\n## Use Case\nProduct Group FOC is ideal when the company wants to push a category rather than a specific product. For example, 'buy chips, get any beverage free' — the specific beverage depends on what the retailer stocks."
+    },
+    {
+      "scenarioSlug": "user-selected-foc",
+      "title": "User-Selected FOC — Buyer Picks Free Items",
+      "tags": [
+        "FOC",
+        "user-selection",
+        "retailer"
+      ],
+      "contentMd": "## Common Questions\n- **Can the buyer choose their own free items?** Yes — use User-Selected FOC. The buyer picks from a pre-configured allowed list.\n- **Can they over-select?** No — the total selected quantity must match the slab benefit exactly.\n\n## Example\nA promo offers: Buy 100 cases of any beverage, get 10 free items of your choice from the 'Summer Mix' list.\n- The 'Summer Mix' list contains: Pepsi 500ml, 7Up 500ml, Mirinda 500ml, Mountain Dew 500ml\n- Retailer qualifies with 100 cases → system shows the allowed list\n- Retailer picks: 6 × Pepsi 500ml and 4 × Mirinda 500ml (total = 10, matches slab benefit)\n- System validates: all selected products are in the allowed list, total = 10 ✓\n- Items are added as free goods to the order\n\n## What Happens if Selection is Wrong\n- Retailer tries to select 12 items instead of 10 → system rejects (over-selection not allowed)\n- Retailer picks a product not in the allowed list → system rejects\n- Retailer picks only 8 items → system may reject (total must match slab benefit exactly)\n\n## Rules\n1. Buyer picks free items from an allowed list during order placement\n2. Total selected quantity must match the slab benefit — no over-selection\n3. System validates that all selected products are in the configured allowed list\n4. Available to salespersons, retailers, and distributors\n\n## Use Case\nUser-selected FOC is ideal when the company wants to give the buyer flexibility — 'you earned 10 free items, pick what you want from this list'. This increases retailer satisfaction and reduces returns of unwanted free goods."
+    }
+  ]
+}

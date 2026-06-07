@@ -1,0 +1,30 @@
+{
+  "feature": {
+    "module": "Outlet Targeting",
+    "featureSlug": "outlet-exclusions",
+    "title": "Outlet Exclusions",
+    "tags": [
+      "outlet",
+      "exclusion",
+      "filter",
+      "negative-targeting"
+    ],
+    "tenantConfigurable": true,
+    "tenantConfigPoints": [
+      "Exclusion attribute configuration"
+    ],
+    "contentMd": "## What It Does\nAllows specific outlet attribute values to be excluded from a promotion's scope. While Outlet Eligibility defines who IS included, Outlet Exclusions define who is NOT — even if they match the eligibility criteria.\n\nExclusions work at the attribute level, not at individual outlet codes.\n\n## Common Questions\n- **Can I exclude certain types of outlets from a promotion?** Yes — use Outlet Exclusions. Set attribute values to exclude (e.g., Segment = Discounted).\n- **What's the difference between eligibility and exclusion?** Eligibility defines who IS included. Exclusion removes specific outlets EVEN IF they match eligibility.\n- **Can I exclude individual outlets by code?** No — exclusions work at the attribute level only (e.g., exclude all outlets of a certain segment).\n\n## How It Differs from Eligibility\n- **Outlet Eligibility**: 'I want this promo for Gold outlets in Modern Trade'\n- **Outlet Exclusion**: 'But NOT for outlets in the Discounted segment'\n- Exclusions are checked AFTER eligibility. An outlet may match all eligibility criteria but still be excluded if it matches any exclusion criterion.\n\n## Scope\n### In Scope\n- Attribute-level exclusion from promo scope\n- Configurable exclusion attributes per tenant\n\n### Out of Scope\n- Individual outlet code exclusions\n- Outlet eligibility (covered in Outlet Eligibility)\n\n## Who Uses It\n- **Trade Marketing Manager** — sets exclusion criteria when creating or editing a promo\n\n## Rules\n1. Exclusions work at the attribute level (e.g., exclude Segment = Discounted)\n2. Exclusion attributes are configured per tenant in metadata\n3. Exclusion checks are run after eligibility matching\n4. An outlet matching ANY exclusion criteria is excluded (OR logic)\n\n## Data & Fields\n| Field | Description | Required | Example |\n|-------|-------------|----------|--------|\n| Exclusion Attribute | Outlet attribute to exclude | Yes | Segment |\n| Exclusion Value | Attribute value to exclude | Yes | Discounted |\n| Promo ID | Promotion being configured | Yes | PROMO-2024-001 |\n\n## Tenant-Level Configurations\n| Config Point | Options | Default | Example |\n|-------------|---------|---------|--------|\n| Exclusion attribute list | Outlet attributes eligible for exclusion | None | Segment, SubChannel |"
+  },
+  "scenarios": [
+    {
+      "scenarioSlug": "excluding-outlet-attributes",
+      "title": "Excluding Outlet Attributes from a Promotion",
+      "tags": [
+        "exclusion",
+        "attribute-level",
+        "negative-targeting"
+      ],
+      "contentMd": "## What It Does\nWhen creating a promo, you can specify outlet attributes to exclude. Even if an outlet matches all eligibility criteria, it will be excluded if it matches any exclusion attribute.\n\n## Example\nA company runs a 'Premium Push' promo for Gold-tier outlets. However, they want to exclude outlets in the 'Discounted' and 'Closeout' segments because those outlets already offer deep discounts.\n\n1. Trade marketing creates a promo targeting Outlet Type = Gold\n2. Adds exclusion: Segment = 'Discounted'\n3. Adds another exclusion: Segment = 'Closeout'\n\nNow when orders come in:\n- Outlet A: Gold + Segment = Premium → Eligible ✓ (Gold matches, not excluded)\n- Outlet B: Gold + Segment = Discounted → **Excluded** ✗ (Gold matches, but Discounted is excluded)\n- Outlet C: Gold + Segment = Closeout → **Excluded** ✗ (Gold matches, but Closeout is excluded)\n- Outlet D: Silver + Segment = Premium → Not eligible ✗ (Silver doesn't match Gold)\n\n## Example with Multiple Exclusion Attributes\nA promo targets all outlets (no eligibility restrictions) but excludes:\n- Sub-Channel = 'E-Commerce'\n- Segment = 'Test'\n\nAny outlet matching EITHER exclusion is excluded (OR logic):\n- An E-Commerce outlet → excluded\n- A Test outlet → excluded\n- A regular retail outlet → eligible\n\n## Rules\n1. Exclusions are checked AFTER eligibility passes — so an outlet must match eligibility first\n2. Only attributes configured as 'exclusion-eligible' in tenant metadata can be used\n3. If an outlet matches ANY exclusion criterion, it is excluded (OR logic between exclusions)\n4. You cannot exclude by individual outlet code — only by attribute values\n5. Common exclusion attributes: Segment, SubChannel, Classification"
+    }
+  ]
+}

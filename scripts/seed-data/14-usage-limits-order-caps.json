@@ -1,0 +1,46 @@
+{
+  "feature": {
+    "module": "Budget, Caps & Limits",
+    "featureSlug": "usage-limits-order-caps",
+    "title": "Usage Limits (Order Caps)",
+    "tags": [
+      "cap",
+      "usage-limit",
+      "order-cap",
+      "retailer-limit",
+      "capping",
+      "how-many-times"
+    ],
+    "tenantConfigurable": true,
+    "tenantConfigPoints": [
+      "Capping scope",
+      "Invoice-level capping"
+    ],
+    "contentMd": "## What It Does\nControls how many times a promotion can be used, independent of monetary budget. Multiple limits can be combined — all are checked together and the first one hit stops the promo.\n\nSupports capping at company-wide, per-distributor, per-retailer, and per-order scopes.\n\n## Common Questions\n- **Can I limit how many times a promo is used?** Yes — set a Promo Limit (e.g., max 1,000 uses total).\n- **Can I limit how many times one shop/retailer can use it?** Yes — set a Retailer Wise Limit (e.g., max 10 times per retailer).\n- **Can I limit how many times a promo applies within one order?** Yes — set a Per Order Cap (e.g., max 2 applications per order).\n- **Can I combine multiple limits?** Yes — set all three. The first limit hit blocks the promo.\n- **What's the difference between budget and usage limits?** Budget limits track spending (₹ or quantity). Usage limits track the number of times the promo is applied, regardless of the discount amount.\n\n## Scope\n### In Scope\n- Promo limit (total uses)\n- Per-order cap\n- Retailer-wise limit\n- Capping scopes (Company/Distributor)\n\n### Out of Scope\n- Monetary budget (covered in Promotion Budget)\n- Time-based frequency limits (covered in Frequency Capping)\n\n## Who Uses It\n- **Trade Marketing Manager** — configures usage limits when creating a promotion\n- **System** — tracks counters and enforces limits in real-time\n\n## Rules\n1. Promo Limit: total uses across the entire account\n2. Promo per Order Cap: max uses within a single order\n3. Retailer Wise Promo Limit: separate counter per retailer\n4. Multiple limits can be combined — first hit stops the promo\n5. Capping can be company-wide or per-distributor\n6. Invoice-level capping: per-retailer counter across all orders\n\n## Data & Fields\n| Field | Description | Required | Example |\n|-------|-------------|----------|--------|\n| Promo Limit | Total uses across the account | No | 1000 |\n| Per Order Cap | Max uses per order | No | 2 |\n| Retailer Wise Limit | Per-retailer counter | No | 20 |\n| Capping Scope | Company or distributor | No | Company |\n| Capping Value | Usage limit number | No | 25 |\n\n## Tenant-Level Configurations\n| Config Point | Options | Default | Example |\n|-------------|---------|---------|--------|\n| Capping scope | Company / Distributor | Company | Shared or per-distributor |\n| Invoice-level capping | ON/OFF | OFF | Per-retailer counter |"
+  },
+  "scenarios": [
+    {
+      "scenarioSlug": "combining-multiple-usage-limits",
+      "title": "Combining Multiple Usage Limits",
+      "tags": [
+        "usage-limit",
+        "combined",
+        "promo-limit",
+        "retailer-wise"
+      ],
+      "contentMd": "## Common Questions\n- **If I set both a total limit and a per-retailer limit, which one wins?** Both are active simultaneously. The first limit hit blocks the promo for the relevant scope. Per-retailer limit blocks that specific retailer; total limit blocks everyone.\n\n## Example\nA promo has: Total Limit = 100 orders, Retailer Limit = 10 orders per retailer.\n\n1. Retailer A uses the promo 10 times → Retailer A is blocked (hit per-retailer cap)\n2. Retailer B has used it only 5 times → Retailer B can still use it\n3. Across all retailers, total usage reaches 100 → promo stops for ALL retailers\n4. Even Retailer C who only used it 2 times is now blocked (total cap hit)\n\n## Example — Per Order Cap\nA promo applies per-item discount of ₹5. Per Order Cap = 2.\n- Order has 3 qualifying items → promo applies only to the first 2 items\n- Third item does not get the discount\n- Next order gets a fresh count — first 2 items qualify again\n\n## Rules\n1. Multiple limits are active simultaneously — ALL are checked on every order\n2. The first limit hit blocks the promo for the relevant scope\n3. Promo Limit blocks globally, Retailer Wise blocks per-retailer\n4. Example: Promo Limit = 100 AND Retailer Wise = 10 — each retailer caps at 10, overall caps at 100\n5. Per Order Cap works differently: limits how many times the promo applies within a single qualifying order"
+    },
+    {
+      "scenarioSlug": "capping-scopes-company-vs-distributor",
+      "title": "Capping Scopes — Company vs Distributor vs Invoice",
+      "tags": [
+        "capping",
+        "scope",
+        "company",
+        "distributor",
+        "invoice"
+      ],
+      "contentMd": "## Common Questions\n- **Should I cap usage at the company level or distributor level?** Company-level gives you one shared counter. Distributor-level gives each distributor their own counter — useful when different distributors have different promo allocations.\n- **What is invoice-level capping?** It's a per-retailer usage counter that counts across all of a retailer's invoices — essentially limiting how many invoices/orders a specific retailer can apply the promo to.\n\n## Example — Company-Level Capping\nPromo with company-level cap of 500:\n- All distributors share one counter\n- Distributor A uses 300, Distributor B uses 200 → total = 500 → promo stops everywhere\n\n## Example — Distributor-Level Capping\nSame promo but with distributor-level cap of 250 each:\n- Distributor A uses 250 → promo stops for Distributor A's outlets only\n- Distributor B has used only 100 → promo continues for Distributor B\n\n## Example — Invoice-Level Capping\nPromo with invoice-level cap of 5 per retailer:\n- Retailer X places 5 orders that use the promo → Retailer X is capped\n- Retailer Y has only placed 2 orders → Retailer Y can still use the promo 3 more times\n\n## Rules\n1. **Company-level capping**: one shared usage cap across the entire account. When hit, promo stops everywhere\n2. **Distributor-level capping**: each distributor has their own counter. When Distributor A hits the cap, only their outlets are blocked\n3. **Invoice-level capping**: each retailer gets their own counter across all their orders\n4. Trade marketing chooses the scope when configuring the cap\n5. Different scope types can be combined on the same promo"
+    }
+  ]
+}

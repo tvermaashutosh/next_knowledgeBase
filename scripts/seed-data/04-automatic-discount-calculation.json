@@ -1,0 +1,43 @@
+{
+  "feature": {
+    "module": "Order Discounts",
+    "featureSlug": "automatic-discount-calculation",
+    "title": "Automatic Discount Calculation",
+    "tags": [
+      "calculation",
+      "order",
+      "discount",
+      "automatic",
+      "matching"
+    ],
+    "tenantConfigurable": true,
+    "tenantConfigPoints": [
+      "Promo caching toggle",
+      "Promo group conflict resolution mode"
+    ],
+    "contentMd": "## What It Does\nAutomatically calculates and applies all eligible promotional discounts when an order reaches the summary stage. The system matches the order against all active promotions based on outlet, product, location, and supplier criteria, then checks eligibility and computes the final discount.\n\nPer-item discount previews are handled offline within the app. The backend calculation is triggered on the order summary page.\n\n## Common Questions\n- **How are discounts applied to an order?** Automatically — when the order summary page loads, the system matches the order against all active promotions and applies eligible discounts.\n- **Does someone need to manually approve discounts?** No — discounts are applied automatically with no manual approval.\n- **What happens when two promotions conflict?** If they are in the same promo group, only the best one is applied. If they are in different groups, both apply.\n- **Can I preview discounts before placing the order?** Yes — per-item discount previews are shown in the app during item selection.\n\n## Scope\n### In Scope\n- Automatic calculation on order summary\n- Invoice-time calculation for primary promos\n- Promo group conflict resolution\n- Caching of calculation results\n\n### Out of Scope\n- Budget management (covered in Promotion Budget)\n- Promo creation (covered in Creating a Promotion)\n\n## Who Uses It\n- **Salesperson** — sees discounts on the order summary page in the Sales Rep App\n- **Retailer** — sees discounts in the Retailer App\n- **Distributor** — sees discounts in the DMS\n- **System** — matches and applies discounts automatically\n\n## How It Works\n1. Salesperson/retailer/distributor places an order and opens the order summary page\n2. System fetches all active promotions\n3. For each promo, the system checks: Is this outlet eligible? Are the right products in the order? Does the location match? Is the supplier correct?\n4. For promos that match, the system checks slab qualification — does the order quantity/amount fall within a slab range?\n5. For qualifying promos, the system calculates the discount amount based on slab benefit and repeat mode\n6. If multiple promos from the same group qualify, the system picks the best one (conflict resolution)\n7. All eligible discounts are applied to the order automatically\n8. The total discount is shown on the order summary\n\n## Rules\n1. Discount calculation is triggered automatically on the order summary page — no manual action needed\n2. Per-item calculation is handled offline in-app for performance\n3. The system matches the order against all active promotions and automatically applies eligible discounts\n4. Discounts are applied automatically — no manual approval required\n5. Calculation results can be cached for performance to speed up subsequent queries\n\n## Data & Fields\n| Field | Description | Required | Example |\n|-------|-------------|----------|--------|\n| Order ID | Unique order identifier | Yes | ORD-2024-001 |\n| Outlet Code | Outlet placing the order | Yes | OUT-GOLD-123 |\n| Product Lines | Items in the order | Yes | SKU-PEPSI-500ML x 50 |\n| Applied Promos | Promos applied by system | No | PROMO-SUMMER-001 |\n| Total Discount | Sum of all discounts | No | ₹5,000 |\n\n## Tenant-Level Configurations\n| Config Point | Options | Default | Example |\n|-------------|---------|---------|--------|\n| Promo caching | ON/OFF | OFF | Cache matching promos to avoid re-querying |\n| Conflict resolution | Best discount / First match | Best discount | How to resolve group conflicts |"
+  },
+  "scenarios": [
+    {
+      "scenarioSlug": "order-time-vs-invoice-time",
+      "title": "Order-Time vs Invoice-Time Calculation",
+      "tags": [
+        "calculation",
+        "order-time",
+        "invoice-time",
+        "primary-promo"
+      ],
+      "contentMd": "## What It Does\nSome discounts are calculated at order time (when the order summary loads), while others are calculated at invoice time (when the invoice is finalized). This scenario explains the difference.\n\n## Example — Order Time\nA retailer orders 50 cases of beverages. The order summary page loads, and the system runs the discount calculation:\n- Promo 'Summer Push 10%' qualifies → 10% discount applied\n- Total discount: ₹2,500\n- This discount appears on the order summary and is locked in\n\n## Example — Invoice Time\nThe same order is invoiced later. At invoice time, the distributor's primary promo kicks in:\n- The ordered quantity was 50 cases, but only 45 were actually delivered\n- Primary promo '5% on delivered beverages' applies to the final invoiced 45 cases\n- Invoice discount = 5% of 45 cases = ₹1,125\n\n## Why the Distinction Matters\n- **Order-time promos** are applied based on what the customer ordered — locked in at order placement\n- **Invoice-time promos** (typically distributor primary promos) are applied based on what was actually delivered/invoiced — because the final quantity may differ from the ordered quantity\n- This ensures discounts reflect reality, not just intent\n\n## Rules\n1. Most promos are calculated at **order time** — when the order summary page loads\n2. **Primary promos** (generally defined at distributor level) are calculated at **invoice time** — when the invoice is generated\n3. The timing distinction exists because primary/distributor promos may depend on final invoiced quantities which can differ from ordered quantities\n4. Per-item discount previews are computed offline within the app for speed — the full backend calculation runs at summary page load\n5. The same calculation process is used for both order-time and invoice-time — only the promo set differs"
+    },
+    {
+      "scenarioSlug": "promo-group-conflict-resolution",
+      "title": "Promo Group Conflict Resolution",
+      "tags": [
+        "conflict",
+        "promo-group",
+        "best-discount"
+      ],
+      "contentMd": "## What It Does\nWhen multiple promotions from the same group qualify for an order, only ONE is applied. The system automatically picks the one that gives the best benefit to the customer.\n\n## Example\nA distributor has three active promotions in the 'Beverages Q2' group:\n- Promo A: Buy 50 cases → 5% off (₹2,500 discount)\n- Promo B: Buy 50 cases → flat ₹2,000 off\n- Promo C: Buy 50 cases → free 3 cases of Pepsi (worth ₹1,800)\n\nAn order for 50 cases qualifies for all three. The system resolves the conflict:\n- Promo A gives ₹2,500 → **best discount**\n- System applies Promo A only. Promo B and C are skipped.\n\n## Example — No Conflict (Different Groups)\nSame order, but there are also promos in other groups:\n- 'Beverages Q2' group → Promo A wins (₹2,500)\n- 'All Products Summer' group → Promo D qualifies (₹500 flat off)\n- Both groups are independent → both apply\n- Total discount: ₹2,500 + ₹500 = ₹3,000\n\n## Rules\n1. Promotions can be assigned to a promo group (via promoGroupId)\n2. When multiple promos from the **same group** qualify for an order, only ONE is applied\n3. The system picks the promo giving the **best discount** to the customer\n4. Promos from **different groups** do not conflict — they can all apply simultaneously\n5. If no promoGroupId is set, the promo does not participate in conflict resolution — it always applies if eligible\n6. The exact conflict resolution strategy (best discount vs. first match) is configurable per tenant"
+    }
+  ]
+}

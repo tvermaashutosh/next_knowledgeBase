@@ -1,0 +1,41 @@
+{
+  "feature": {
+    "module": "Order Discounts",
+    "featureSlug": "order-edit-and-cancellation-impact",
+    "title": "Order Edit & Cancellation Impact",
+    "tags": [
+      "edit",
+      "cancel",
+      "budget-revert",
+      "recalculation",
+      "bulk-cancel"
+    ],
+    "tenantConfigurable": true,
+    "tenantConfigPoints": [
+      "See Tenant-Level Configurations"
+    ],
+    "contentMd": "## What It Does\nHandles the promotional impact when an order is edited or cancelled. On edit, the system fully recalculates discounts from scratch. On cancellation, all consumed budgets are restored.\n\nSupports single and bulk cancellation with rollback capability.\n\n## Common Questions\n- **What happens to the discount when I edit an order?** The system recalculates all discounts from scratch. The old discount is reversed, and a new one is applied based on the updated order.\n- **Does the budget come back when an order is cancelled?** Yes — all budget consumed by that order is restored automatically.\n- **Can I cancel many orders at once?** Yes — use bulk cancel to cancel multiple orders in a single operation.\n- **Can I undo a bulk cancel?** Yes — use the rollback feature to reverse a bulk cancel.\n\n## Scope\n### In Scope\n- Full recalculation on order edit\n- Budget restoration on cancellation\n- Bulk cancel and rollback\n- Purchase history revert on cancel\n\n### Out of Scope\n- Budget configuration (covered in Promotion Budget)\n- Frequency cap management (covered in Frequency Capping)\n\n## Who Uses It\n- **Salesperson / Retailer / Distributor** — can edit or cancel their orders\n- **Operations Manager** — may trigger bulk cancellation for mistaken invoices\n\n## Rules\n1. Order Edit: full recalculation from scratch — different promos may apply after edit\n2. Order Cancel: all consumed budgets restored (promo, distributor, outlet, per-order)\n3. Bulk Cancel: multiple orders cancelled at once — used for mistaken invoices\n4. Rollback: bulk cancel can be reversed if triggered by mistake\n5. Anyone with access can edit or cancel\n6. No time limit on cancellation currently\n7. Purchase history counts (how many times a promo was used) are also reverted on cancellation\n\n## Data & Fields\n| Field | Description | Required | Example |\n|-------|-------------|----------|--------|\n| Order ID | Order being edited or cancelled | Yes | ORD-2024-001 |\n| Cancel Type | Single or Bulk | Yes | Single / Bulk |\n| Reverted Budget | Amount restored to budget | No | ₹5,000 |\n| Rollback Flag | Whether to reverse a cancel | No | true / false |\n\n## Tenant-Level Configurations\n| Config Point | Options | Default | Example |\n|-------------|---------|---------|--------|\n| Bulk cancel batch size | Configurable | 100 | Max orders per batch |"
+  },
+  "scenarios": [
+    {
+      "scenarioSlug": "order-edit-full-recalculation",
+      "title": "Order Edit — Full Recalculation from Scratch",
+      "tags": [
+        "edit",
+        "recalculation",
+        "budget-revert"
+      ],
+      "contentMd": "## What It Does\nWhen a customer or salesperson edits an order (changes products, quantities, etc.), the system does NOT just adjust the existing discount. Instead, it recalculates ALL discounts from scratch. This means different promos may apply after the edit.\n\n## Example\n1. A retailer places an order for 50 cases of beverages\n2. The 'Summer Push 10%' promo qualifies → 10% discount = ₹5,000 applied\n3. Budget of ₹5,000 is deducted from the promo's budget\n4. The retailer edits the order to 30 cases (decides they don't need as many)\n5. System first **reverts** the old ₹5,000 from the budget (budget restored)\n6. System then **recalculates** from scratch with 30 cases\n7. 30 cases falls into Slab 1 (5% off instead of 10%) → new discount = ₹1,500\n8. New budget of ₹1,500 is deducted\n9. Net budget impact: ₹5,000 restored - ₹1,500 deducted = ₹3,500 saved\n\n## Why Full Recalculation Instead of Adjustment?\n- The edited order may qualify for entirely different promos\n- Slab levels may change (e.g., dropping from Slab 2 to Slab 1)\n- Must-buy conditions may no longer be met\n- Full recalculation guarantees accuracy\n\n## Rules\n1. Edit triggers a complete recalculation — NOT an incremental adjustment on the old discount\n2. Old budget is reverted BEFORE new calculation begins\n3. Different promos may apply after edit (quantities changed, different slabs hit)\n4. Budget revert and new deduction happen as a single operation — no gaps"
+    },
+    {
+      "scenarioSlug": "bulk-cancel-and-rollback",
+      "title": "Bulk Cancel and Rollback for Mistaken Invoices",
+      "tags": [
+        "bulk-cancel",
+        "rollback",
+        "invoices"
+      ],
+      "contentMd": "## What It Does\nWhen multiple invoices are created by mistake (e.g., a system error or duplicate processing), the operations team can cancel all of them at once. All budgets consumed by those orders are restored. If the bulk cancel itself was a mistake, it can be rolled back.\n\n## Example — Bulk Cancel\n1. Operations discovers that 50 invoices were created as duplicates due to a system error\n2. Total discount consumed by these 50 invoices: ₹2,50,000\n3. Operations triggers a bulk cancel for all 50 invoices\n4. System cancels each order and restores its budget\n5. Total ₹2,50,000 is restored to the promo budget\n6. Usage counters are decremented by 50\n7. Purchase history counts for these 50 orders are reverted\n\n## Example — Rollback of Bulk Cancel\n1. After the bulk cancel, the team realizes that 10 of the 50 invoices were legitimate\n2. They trigger a rollback on the entire bulk cancel\n3. System reverses all 50 cancellations — re-deducts ₹2,50,000 from budget\n4. Now they individually re-cancel only the 40 that were actually mistaken\n5. ₹2,00,000 restored (for the 40 legitimate cancellations)\n\n## Rules\n1. Bulk cancel processes multiple orders in a single operation\n2. Budget restoration is all-or-nothing — all orders succeed or all fail\n3. Rollback reverses a previous bulk cancel — re-deducts all previously restored budgets\n4. Both budget amounts and usage counters are affected by cancel and rollback\n5. Batch size is configurable (default: 100 orders per batch)"
+    }
+  ]
+}

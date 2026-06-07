@@ -1,0 +1,33 @@
+{
+  "feature": {
+    "module": "Budget, Caps & Limits",
+    "featureSlug": "budget-restoration-on-cancel-edit",
+    "title": "Budget Restoration on Cancel/Edit",
+    "tags": [
+      "budget-revert",
+      "cancel",
+      "edit",
+      "restoration",
+      "rollback",
+      "refund-budget"
+    ],
+    "tenantConfigurable": true,
+    "tenantConfigPoints": [
+      "See Tenant-Level Configurations"
+    ],
+    "contentMd": "## What It Does\nEnsures that when an order is cancelled or edited, all promotional budgets and usage counters consumed by that order are properly restored. Prevents phantom budget consumption from cancelled orders.\n\nWorks across all budget types. Supports bulk restoration as a single operation.\n\n## Common Questions\n- **If I cancel an order, does the promo budget come back?** Yes — the full budget consumed by that order is restored automatically.\n- **What happens to the budget when an order is edited?** The old budget is restored first, then the new (recalculated) discount deducts the new amount.\n- **Can I cancel multiple orders at once and get all budgets back?** Yes — bulk cancel restores budgets for all orders in the batch.\n- **What if a bulk cancel was done by mistake?** You can rollback the bulk cancel, which re-deducts all the restored budgets.\n- **Are usage counters (how many times promo was used) also restored?** Yes — all counters are decremented on cancel.\n\n## Scope\n### In Scope\n- Budget restoration on order cancel\n- Budget revert and re-deduct on order edit\n- Bulk restoration as a single operation\n- Purchase history revert\n\n### Out of Scope\n- Budget configuration (covered in Promotion Budget)\n- Usage limit configuration (covered in Usage Limits)\n\n## Who Uses It\n- **System** — automatically triggers budget restoration on cancel/edit\n- **Operations Manager** — bulk cancel triggers restoration for multiple orders\n\n## Rules\n1. Cancel: all consumed budget restored — promo, distributor, outlet, per-order, purchase history\n2. Edit: old budget reverted, then new discount deducts new budget\n3. Works across ALL budget types as a single operation\n4. Bulk cancel: restores budgets for multiple orders — all or nothing\n5. Rollback of bulk cancel: re-deducts previously restored budgets\n6. Usage counters (promo limit, retailer-wise) also decremented on cancel\n\n## Data & Fields\n| Field | Description | Required | Example |\n|-------|-------------|----------|--------|\n| Order ID | Order being cancelled/edited | Yes | ORD-2024-001 |\n| Reverted Amount | Budget amount restored | No | ₹5,000 |\n| Reverted Quantity | Free goods quantity restored | No | 10 |\n| Operation Type | Cancel / Edit / Rollback | Yes | Cancel |\n\n## Tenant-Level Configurations\n| Config Point | Options | Default | Example |\n|-------------|---------|---------|--------|\n| All-or-nothing restoration | ON/OFF | ON | All-or-nothing for bulk ops |"
+  },
+  "scenarios": [
+    {
+      "scenarioSlug": "budget-revert-on-cancel-and-edit",
+      "title": "Budget Revert on Cancel and Edit",
+      "tags": [
+        "budget-revert",
+        "cancel",
+        "edit",
+        "all-or-nothing"
+      ],
+      "contentMd": "## Common Questions\n- **How exactly does budget restoration work on cancel?** The full discount amount is added back to the promo budget. If ₹5,000 was deducted, ₹5,000 is restored.\n- **On edit, is the budget just adjusted?** No — the old budget is fully restored first, then the new discount is calculated from scratch and deducted fresh.\n\n## Example — Cancel\n1. A promo has ₹50,000 budget. An order consumed ₹5,000 → remaining = ₹45,000.\n2. Some more orders consume ₹20,000 → remaining = ₹25,000.\n3. The first order (₹5,000) is cancelled.\n4. System restores ₹5,000 → remaining budget becomes ₹30,000.\n5. Usage counter is decremented by 1.\n6. The promo can now serve more orders with the restored ₹5,000.\n\n## Example — Edit\n1. An order for 50 cases had ₹3,000 discount applied → ₹3,000 deducted from budget.\n2. Customer edits the order to 30 cases.\n3. System reverts ₹3,000 first → budget restored.\n4. System recalculates discount on 30 cases → new discount = ₹1,500.\n5. System deducts ₹1,500 from budget.\n6. Net effect: ₹1,500 was returned to the budget (₹3,000 restored - ₹1,500 re-deducted).\n\n## Example — Bulk Cancel with Rollback\n1. Operations cancels 50 mistaken invoices → ₹2,50,000 total budget is restored.\n2. Team realizes 10 of those invoices were actually correct.\n3. They rollback the entire bulk cancel → all ₹2,50,000 is re-deducted.\n4. Then they individually re-cancel only the 40 that were truly mistaken → ₹2,00,000 restored.\n\n## Rules\n1. Budget restoration works as all-or-nothing — cannot partially restore.\n2. All budget types affected: promo budget, distributor budget, outlet budget, per-order limits.\n3. Purchase history counts are also reverted.\n4. For bulk cancel: all orders restored in a single operation — if one fails, all fail.\n5. Rollback reverses a previous cancel by re-deducting the restored amounts."
+    }
+  ]
+}
