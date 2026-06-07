@@ -1,0 +1,138 @@
+@import "tailwindcss";
+
+@theme {
+  /* ─── Dark Mode (default) ─── */
+  --color-kb-bg: #0f1419;
+  --color-kb-bg-alt: #141c24;
+  --color-kb-surface: #1a2332;
+  --color-kb-surface-2: #1f2b3d;
+  --color-kb-surface-3: #263548;
+  --color-kb-border: #2a3a50;
+  --color-kb-border-light: #3a4f6b;
+
+  --color-kb-text: #edf2f7;
+  --color-kb-text-muted: #94a3b8;
+  --color-kb-text-dim: #5a6f8a;
+
+  /* Primary teal */
+  --color-kb-primary: #17c3b2;
+  --color-kb-primary-light: #2dd4c4;
+  --color-kb-primary-dark: #0fa89a;
+  --color-kb-primary-glow: rgba(23, 195, 178, 0.15);
+
+  /* Accent gold */
+  --color-kb-accent: #fac125;
+  --color-kb-accent-light: #fbd24e;
+  --color-kb-accent-dark: #e0a800;
+
+  /* Navy */
+  --color-kb-navy: #084157;
+  --color-kb-navy-light: #0a5a76;
+
+  /* Semantic */
+  --color-kb-success: #34d399;
+  --color-kb-warning: #fac125;
+  --color-kb-danger: #f87171;
+  --color-kb-info: #38bdf8;
+
+  /* Status */
+  --color-kb-draft: #fac125;
+  --color-kb-review: #38bdf8;
+  --color-kb-approved: #34d399;
+
+  --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
+}
+
+/* ─── Light Mode Overrides ─── */
+[data-theme="light"] {
+  --color-kb-bg: #f5f7fa;
+  --color-kb-bg-alt: #edf0f5;
+  --color-kb-surface: #ffffff;
+  --color-kb-surface-2: #f0f3f8;
+  --color-kb-surface-3: #e5eaf2;
+  --color-kb-border: #d4dbe8;
+  --color-kb-border-light: #c0cad8;
+
+  --color-kb-text: #1a2332;
+  --color-kb-text-muted: #4a5568;
+  --color-kb-text-dim: #8896aa;
+
+  --color-kb-primary: #0fa89a;
+  --color-kb-primary-light: #17c3b2;
+  --color-kb-primary-dark: #0d8f83;
+  --color-kb-primary-glow: rgba(15, 168, 154, 0.1);
+
+  --color-kb-accent: #e0a800;
+  --color-kb-accent-light: #fac125;
+  --color-kb-accent-dark: #c99500;
+
+  --color-kb-navy: #084157;
+  --color-kb-navy-light: #0a5a76;
+
+  --color-kb-success: #059669;
+  --color-kb-warning: #d97706;
+  --color-kb-danger: #dc2626;
+  --color-kb-info: #0284c7;
+
+  --color-kb-draft: #d97706;
+  --color-kb-review: #0284c7;
+  --color-kb-approved: #059669;
+}
+
+@layer base {
+  body {
+    @apply bg-kb-bg text-kb-text font-sans antialiased;
+    transition: background-color 0.3s ease, color 0.3s ease;
+  }
+
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+
+  ::-webkit-scrollbar-track {
+    @apply bg-kb-surface;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    @apply bg-kb-border-light rounded-full;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    @apply bg-kb-text-dim;
+  }
+}
+
+@layer components {
+  .form-input {
+    @apply w-full bg-kb-surface-2 border border-kb-border rounded-lg px-3 py-2 text-sm text-kb-text placeholder:text-kb-text-dim focus:outline-none focus:border-kb-primary/50 focus:ring-1 focus:ring-kb-primary/30 transition-colors;
+  }
+
+  select.form-input {
+    @apply pr-8 appearance-none cursor-pointer;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%235a6f8a'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 0.5rem center;
+    background-size: 1.25rem;
+  }
+
+  textarea.form-input {
+    @apply resize-y;
+  }
+
+  .add-btn {
+    @apply mt-3 text-sm text-kb-primary hover:text-kb-primary-light transition-colors font-medium;
+  }
+
+  .kb-btn-primary {
+    @apply px-5 py-2.5 bg-gradient-to-r from-kb-primary to-kb-primary-dark text-white rounded-lg text-sm font-semibold hover:from-kb-primary-light hover:to-kb-primary shadow-lg shadow-kb-primary/20 transition-all;
+  }
+
+  .kb-btn-secondary {
+    @apply px-5 py-2.5 bg-kb-surface-2 text-kb-text rounded-lg text-sm font-medium hover:bg-kb-surface-3 border border-kb-border transition-all;
+  }
+
+  .kb-card {
+    @apply bg-kb-surface rounded-xl border border-kb-border transition-colors duration-300;
+  }
+}
