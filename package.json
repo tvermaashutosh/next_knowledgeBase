@@ -5,10 +5,11 @@
   "scripts": {
     "dev": "next dev",
     "build": "prisma generate && next build",
+    "vercel-build": "prisma generate && npm run db:reset && next build",
     "start": "next start",
     "lint": "eslint",
     "db:push": "npx prisma db push",
-    "db:reset": "tsx scripts/reset-db.ts && prisma db push && tsx scripts/add-vector-column.ts",
+    "db:reset": "tsx scripts/reset-db.ts && prisma db push && tsx scripts/add-vector-column.ts && tsx scripts/seed-llm-config.ts",
     "db:seed": "node scripts/seed-promotions-kb.js",
     "db:reseed": "npm run db:reset && npm run db:seed",
     "db:studio": "npx prisma studio"

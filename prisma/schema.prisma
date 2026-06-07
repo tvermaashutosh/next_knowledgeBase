@@ -1,0 +1,290 @@
+// Knowledge Base — Prisma Schema
+// Supabase PostgreSQL + pgvector
+
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["postgresqlExtensions"]
+}
+
+datasource db {
+  provider   = "postgresql"
+  extensions = [vector]
+}
+
+// ─── Enums ──────────────────────────────────────────────
+
+enum Status {
+  DRAFT
+  REVIEW
+  APPROVED
+}
+
+enum Role {
+  VIEWER
+  CONTRIBUTOR
+  REVIEWER
+  ADMIN
+}
+
+enum DepType {
+  CONFIGURES
+  DATA_INPUT
+  TRIGGERS
+  VALIDATES
+  SETTLEMENT
+}
+
+// ─── Core Models ────────────────────────────────────────
+
+model Product {
+  id        String          @id @default(cuid())
+  name      String
+  slug      String          @unique
+  overview  String          @db.Text
+  createdBy String?
+  createdAt DateTime        @default(now())
+  updatedAt DateTime        @updatedAt
+  modules   ProductModule[]
+}
+
+model Module {
+  id        String          @id @default(cuid())
+  name      String
+  slug      String          @unique
+  overview  String          @db.Text  @default("")
+  createdAt DateTime        @default(now())
+  updatedAt DateTime        @updatedAt
+  products  ProductModule[]
+  features  Feature[]
+}
+
+model ProductModule {
+  id        String  @id @default(cuid())
+  productId String
+  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+  moduleId  String
+  module    Module  @relation(fields: [moduleId], references: [id], onDelete: Cascade)
+
+  @@unique([productId, moduleId])
+  @@index([productId])
+  @@index([moduleId])
+}
+
+model Feature {
+  id                 String           @id @default(cuid())
+  moduleId           String
+  module             Module           @relation(fields: [moduleId], references: [id], onDelete: Cascade)
+  slug               String
+  title              String
+  status             Status           @default(DRAFT)
+  ownerId            String?
+  owner              User?            @relation("ownedFeatures", fields: [ownerId], references: [id])
+  contentMd          String           @db.Text
+  globalContext      Json             @default("[]")  // Feature-level globals: [{key, value, description}]
+  metadataJson       Json             @default("{}")
+  tags               String[]         @default([])
+  applicableProducts String[]         @default([])  // Product slugs this feature applies to (empty = all module's products)
+  glossaryTerms      Json             @default("[]")  // [{term, definition, dontSay[]}]
+  completeness       Int              @default(0)
+  reviewCycle        String           @default("quarterly")
+  tenantConfigurable Boolean          @default(false)
+  tenantConfigPoints String[]         @default([])
+  createdAt          DateTime         @default(now())
+  updatedAt          DateTime         @updatedAt
+  scenarios          Scenario[]
+  depsFrom           Dependency[]     @relation("depFrom")
+  depsTo             Dependency[]     @relation("depTo")
+  overrides          TenantOverride[]
+  reviews            Review[]
+  embeddings         Embedding[]
+
+  @@unique([moduleId, slug])
+  @@index([moduleId])
+  @@index([status])
+  @@index([updatedAt])
+}
+
+model Scenario {
+  id                 String             @id @default(cuid())
+  featureId          String
+  feature            Feature            @relation(fields: [featureId], references: [id], onDelete: Cascade)
+  slug               String
+  title              String
+  contentMd          String             @db.Text
+  status             Status             @default(DRAFT)
+  ownerId            String?
+  tags               String[]           @default([])
+  applicableProducts String[]           @default([])  // Product slugs this scenario applies to (empty = all feature's products)
+  createdAt          DateTime           @default(now())
+  updatedAt          DateTime           @updatedAt
+  overrides          ScenarioOverride[]
+
+  @@unique([featureId, slug])
+  @@index([featureId])
+  @@index([status])
+}
+
+model Tenant {
+  id               String             @id @default(cuid())
+  name             String
+  slug             String             @unique
+  overview         String             @db.Text
+  createdAt        DateTime           @default(now())
+  updatedAt        DateTime           @updatedAt
+  overrides        TenantOverride[]
+  scenarioOverrides ScenarioOverride[]
+}
+
+model TenantOverride {
+  id        String   @id @default(cuid())
+  tenantId  String
+  tenant    Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  featureId String
+  feature   Feature  @relation(fields: [featureId], references: [id], onDelete: Cascade)
+  contentMd String   @db.Text
+  ownerId   String?
+  updatedAt DateTime @updatedAt
+
+  @@unique([tenantId, featureId])
+  @@index([tenantId])
+  @@index([featureId])
+}
+
+model ScenarioOverride {
+  id         String   @id @default(cuid())
+  tenantId   String
+  tenant     Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  scenarioId String
+  scenario   Scenario @relation(fields: [scenarioId], references: [id], onDelete: Cascade)
+  contentMd  String   @db.Text
+  ownerId    String?
+  updatedAt  DateTime @updatedAt
+
+  @@unique([tenantId, scenarioId])
+  @@index([tenantId])
+  @@index([scenarioId])
+}
+
+model Dependency {
+  id        String  @id @default(cuid())
+  fromId    String
+  from      Feature @relation("depFrom", fields: [fromId], references: [id], onDelete: Cascade)
+  toId      String
+  to        Feature @relation("depTo", fields: [toId], references: [id], onDelete: Cascade)
+  type      DepType
+  direction String  // "incoming" | "outgoing"
+  what      String
+  when      String
+  impact    String
+
+  @@unique([fromId, toId, type])
+  @@index([fromId])
+  @@index([toId])
+}
+
+// ─── Auth & Users ───────────────────────────────────────
+
+model User {
+  id            String    @id @default(cuid())
+  email         String    @unique
+  name          String
+  avatarUrl     String?
+  role          Role      @default(VIEWER)
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  ownedFeatures Feature[] @relation("ownedFeatures")
+  reviews       Review[]  @relation("reviewer")
+}
+
+model GlossaryEntry {
+  id         String   @id @default(cuid())
+  term       String   @unique
+  definition String   @db.Text
+  dontSay    String[] @default([])
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+}
+
+// ─── Review Workflow ────────────────────────────────────
+
+model Review {
+  id          String   @id @default(cuid())
+  featureId   String
+  feature     Feature  @relation(fields: [featureId], references: [id], onDelete: Cascade)
+  submittedBy String
+  reviewedBy  String?
+  reviewer    User?    @relation("reviewer", fields: [reviewedBy], references: [id])
+  status      String   @default("pending") // "pending" | "approved" | "rejected"
+  comments    String?  @db.Text
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([featureId])
+  @@index([status])
+}
+
+// ─── Embeddings (pgvector) ──────────────────────────────
+
+model Embedding {
+  id         String   @id @default(cuid())
+  featureId  String
+  feature    Feature  @relation(fields: [featureId], references: [id], onDelete: Cascade)
+  section    String
+  chunkText  String   @db.Text
+  // Vector column added via raw SQL (scripts/add-vector-column.ts), not Prisma.
+  // embedding  vector(768)   // nomic-embed-text; set EMBED_DIM if you switch models
+  createdAt  DateTime @default(now())
+
+  @@index([featureId])
+}
+
+// ─── LLM Configuration ─────────────────────────────────
+
+model LlmConfig {
+  id               String @id @default(cuid())
+  generationProvider String @default("groq")
+  generationModel    String @default("llama-3.3-70b-versatile")
+  generationApiKey   String @db.Text
+  embeddingProvider  String @default("ollama")
+  embeddingModel     String @default("nomic-embed-text")
+  embeddingApiKey    String @db.Text
+  updatedAt DateTime @updatedAt
+}
+
+// ─── Audit Log ──────────────────────────────────────────
+
+model AuditLog {
+  id        String   @id @default(cuid())
+  userId    String?
+  action    String   // "created" | "updated" | "deleted" | "approved" | "rejected" | "ingested"
+  entity    String   // "feature" | "product" | "module" | "tenant" | "glossary" | "user"
+  entityId  String
+  details   String?  @db.Text
+  createdAt DateTime @default(now())
+
+  @@index([createdAt])
+  @@index([entity])
+}
+
+// ─── Content Ingestion ─────────────────────────────────
+
+model IngestionJob {
+  id          String   @id @default(cuid())
+  status      String   @default("pending")  // "pending" | "classified" | "applied" | "failed"
+  sources     Json     // [{type, content, meta}]
+  classified  Json?    // AI output: array of staged entities
+  appliedIds  Json?    // IDs of created entities after confirm
+  createdBy   String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+// ─── Confluence Integration ────────────────────────────
+
+model ConfluenceConfig {
+  id        String   @id @default(cuid())
+  baseUrl   String   // e.g. https://yourcompany.atlassian.net/wiki
+  email     String   // Atlassian account email
+  apiToken  String   @db.Text  // API token
+  updatedAt DateTime @updatedAt
+}
